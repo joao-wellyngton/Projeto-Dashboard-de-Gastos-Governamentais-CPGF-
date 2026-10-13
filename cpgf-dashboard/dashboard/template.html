@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painel CPGF</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#e8f0ed; --surface:#fcfcfb; --ink:#0b1f17; --ink2:#43524b; --muted:#6b7a73; --grid:#d5dfda;
+  --brand:#0b5d3b; --brand-2:#2f8f68; --brand-3:#8cc7ab; --brand-soft:#dcebe4;
+  --alta:#c43d3c; --obs:#d9930a; --ctx:#2a78d6;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#6250d6; --s8:#e34948;
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0f1713; --surface:#18221d; --ink:#eaf2ee; --ink2:#b9c8c0; --muted:#8a9a92; --grid:#2a3832;
+  --brand:#3fae82; --brand-2:#2f8f68; --brand-3:#1d5c42; --brand-soft:#21322a;
+  --alta:#e66767; --obs:#e0a526; --ctx:#3987e5;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:10px}
+h1{font-size:22px;margin:0;color:var(--brand)} h1 small{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-top:2px}
+.sim{background:#fff3cd;color:#5c4400;border:1px solid #e6c65c;border-radius:8px;padding:8px 12px;font-size:12.5px;margin:8px 0 12px}
+:root[data-theme="dark"] .sim{background:#3a3010;color:#f1dd9a;border-color:#6b5a1c}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.filters label{display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:2px}
+select,input[type=search]{background:var(--surface);color:var(--ink);border:1px solid var(--grid);border-radius:8px;padding:6px 8px;font:inherit;min-width:140px}
+button.theme{background:var(--surface);color:var(--ink);border:1px solid var(--grid);border-radius:8px;padding:6px 10px;cursor:pointer}
+nav{display:flex;gap:4px;flex-wrap:wrap;margin:10px 0 14px;border-bottom:2px solid var(--grid)}
+nav button{background:none;border:0;padding:9px 14px;font:inherit;font-weight:600;color:var(--ink2);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+nav button[aria-selected=true]{color:var(--brand);border-color:var(--brand)}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.kpi{background:var(--brand);color:#fff;border-radius:16px;padding:14px 16px}
+:root[data-theme="dark"] .kpi{background:#134d36}
+.kpi .l{font-size:12px;opacity:.85}.kpi .v{font-size:26px;font-weight:700;margin-top:2px}.kpi .s{font-size:11.5px;opacity:.8;margin-top:2px}
+.kpi.alta{background:#9b2f2e}
+.card{background:var(--surface);border-radius:16px;padding:14px 16px;border:1px solid var(--grid)}
+.card h2{font-size:14px;margin:0 0 2px;color:var(--ink)} .card p.sub{margin:0 0 8px;color:var(--muted);font-size:12px}
+.cols2{grid-template-columns:repeat(auto-fit,minmax(420px,1fr))}
+svg text{font:11px system-ui,sans-serif;fill:var(--ink2)} svg .v{fill:var(--ink);font-weight:600}
+svg .grid{stroke:var(--grid);stroke-width:1}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--grid);position:sticky;top:0;background:var(--surface)}
+td{padding:6px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.scroll{max-height:460px;overflow:auto}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.badge.alta{background:#f8d9d8;color:#7d1f1e}.badge.obs{background:#fbeccb;color:#6e4a00}.badge.ctx{background:#d8e6f8;color:#14427e}
+:root[data-theme="dark"] .badge.alta{background:#4a1f1f;color:#f3b3b2}:root[data-theme="dark"] .badge.obs{background:#46350c;color:#f1d58a}:root[data-theme="dark"] .badge.ctx{background:#17314f;color:#a9cdf6}
+.rule{font-size:11px;background:var(--brand-soft);color:var(--brand);border-radius:6px;padding:1px 6px;margin-right:3px;white-space:nowrap;display:inline-block;margin-bottom:2px}
+tr.det td{background:var(--brand-soft);font-size:12px;color:var(--ink2)}
+tr.row{cursor:pointer} tr.row:hover td{background:var(--brand-soft)}
+#tip{position:fixed;pointer-events:none;background:#0b1f17;color:#fff;font-size:12px;padding:6px 9px;border-radius:8px;opacity:0;transition:opacity .08s;z-index:10;max-width:320px}
+.note{font-size:12.5px;color:var(--ink2)} .note b{color:var(--ink)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin:2px 0 6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.meth h3{margin:14px 0 4px;font-size:14px;color:var(--brand)} .meth li{margin:3px 0}
+.hidden{display:none}
+@media(max-width:560px){.cols2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Painel de Gastos Governamentais — CPGF<small>Cartão de Pagamento do Governo Federal · atipicidade não é irregularidade</small></h1>
+    <div class="filters">
+      <label>Órgão superior<select id="fOrg"></select></label>
+      <label>De<select id="fIni"></select></label>
+      <label>Até<select id="fFim"></select></label>
+      <button class="theme" id="btnTheme" title="Alternar tema">◐</button>
+    </div>
+  </header>
+  <div id="sim" class="sim hidden"></div>
+  <nav role="tablist" id="tabs"></nav>
+  <main id="view"></main>
+</div>
+<div id="tip"></div>
+<script>
+const D = /*__DATA__*/null;
+</script>
+<script>
+const $=s=>document.querySelector(s);
+const MESES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const lblMes=m=>MESES[+m.slice(5,7)-1]+'/'+m.slice(2,4);
+const brl=v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const brlc=v=>{const a=Math.abs(v);return 'R$ '+(a>=1e6?(v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:2})+' Mi':a>=1e3?(v/1e3).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mil':v.toLocaleString('pt-BR',{maximumFractionDigits:0}))};
+const num=v=>v.toLocaleString('pt-BR');
+const pct=(v,d=1)=>v.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d})+'%';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const CLS={'Atípico - prioridade alta':['alta','Prioridade alta','▲'],'Atípico - observar':['obs','Observar','●'],'Atípico com contexto provável':['ctx','Contexto provável','◆']};
+const badge=c=>{const [k,t,i]=CLS[c]||['obs',c,'●'];return `<span class="badge ${k}">${i} ${t}</span>`};
+const meses=[...new Set(D.cubo.map(r=>r.ano_mes))].sort();
+const orgaos=[...new Set(D.cubo.map(r=>r.orgao_superior))].sort();
+const S={tab:'geral',org:'Todos',ini:meses[0],fim:meses.at(-1),cls:'Todas',regra:'Todas',q:'',open:-1};
+
+// ---------- tooltip
+const tip=$('#tip');
+document.addEventListener('mousemove',e=>{const t=e.target.closest('[data-tip]');if(t){tip.innerHTML=t.dataset.tip;tip.style.opacity=1;tip.style.left=Math.min(e.clientX+14,innerWidth-330)+'px';tip.style.top=(e.clientY+14)+'px'}else tip.style.opacity=0});
+
+// ---------- filtros
+function fOrg(){return S.org==='Todos'?(()=>true):(r=>r.orgao_superior===S.org)}
+const fPer=r=>r.ano_mes>=S.ini&&r.ano_mes<=S.fim;
+const cubo=()=>D.cubo.filter(r=>fOrg()(r)&&fPer(r));
+const sum=(a,k)=>a.reduce((s,r)=>s+r[k],0);
+function groupBy(a,k,v='valor'){const m=new Map();a.forEach(r=>m.set(r[k],(m.get(r[k])||0)+r[v]));return [...m].map(([k,v])=>({k,v}))}
+
+// ---------- gráficos SVG
+function barsV(data,{h=300,fmt=brlc,growth=true,hi=[]}={}){
+  const W=1100,pl=62,pr=8,pt=30,pb=34,iw=W-pl-pr,ih=h-pt-pb,mx=Math.max(...data.map(d=>d.v),1)*1.08,bw=iw/data.length;
+  let s=`<svg viewBox="0 0 ${W} ${h}" width="100%" role="img" aria-label="Gasto por mês">`;
+  for(let i=0;i<=4;i++){const y=pt+ih-ih*i/4;s+=`<line class="grid" x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}"/><text x="${pl-6}" y="${y+4}" text-anchor="end">${fmt(mx*i/4)}</text>`}
+  data.forEach((d,i)=>{const x=pl+i*bw+bw*.14,w=bw*.72,y=pt+ih-ih*d.v/mx,hh=ih*d.v/mx;
+    const sazon=hi.includes(d.k);
+    s+=`<rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="4" fill="${sazon?'var(--brand-2)':'var(--brand)'}" data-tip="<b>${lblMes(d.k)}</b><br>${brl(d.v)}${d.g!=null?'<br>vs mês anterior: '+(d.g>=0?'▲ ':'▼ ')+pct(Math.abs(d.g)):''}${d.y!=null?'<br>vs mesmo mês/ano anterior: '+(d.y>=0?'▲ ':'▼ ')+pct(Math.abs(d.y)):''}${sazon?'<br><i>fim de exercício (nov/dez): alta sazonal esperada</i>':''}"/>`;
+    if(data.length<=24)s+=`<text x="${x+w/2}" y="${y-14}" text-anchor="middle" class="v">${fmt(d.v).replace('R$ ','')}</text>`;
+    if(growth&&d.g!=null&&data.length<=24)s+=`<text x="${x+w/2}" y="${y-3}" text-anchor="middle" style="font-size:9.5px;fill:${d.g>=0?'var(--brand)':'var(--alta)'}">${d.g>=0?'▲':'▼'}${Math.abs(d.g).toFixed(0)}%</text>`;
+    s+=`<text x="${x+w/2}" y="${h-pb+14}" text-anchor="middle" style="font-size:10px">${lblMes(d.k)}</text>`});
+  return s+'</svg>';
+}
+function barsH(data,{fmt=brlc,color='var(--brand)',w=560,max=null,labelW=190,rowH=26}={}){
+  const mx=max||Math.max(...data.map(d=>d.v),1),h=data.length*rowH+8;
+  let s=`<svg viewBox="0 0 ${w} ${h}" width="100%">`;
+  data.forEach((d,i)=>{const y=i*rowH+4,bw=(w-labelW-70)*d.v/mx;
+    s+=`<text x="${labelW-8}" y="${y+15}" text-anchor="end">${esc(d.k.length>30?d.k.slice(0,29)+'…':d.k)}</text>
+    <rect x="${labelW}" y="${y+3}" width="${Math.max(bw,1)}" height="${rowH-9}" rx="4" fill="${d.c||color}" data-tip="<b>${esc(d.k)}</b><br>${brl(d.v)}${d.extra?'<br>'+d.extra:''}"/>
+    <text class="v" x="${labelW+bw+6}" y="${y+15}">${fmt(d.v)}</text>`});
+  return s+'</svg>';
+}
+function stackedMonths(rows){
+  const keys=['Atípico - prioridade alta','Atípico - observar','Atípico com contexto provável'],col={'Atípico - prioridade alta':'var(--alta)','Atípico - observar':'var(--obs)','Atípico com contexto provável':'var(--ctx)'};
+  const ms=meses.filter(m=>m>=S.ini&&m<=S.fim),W=760,h=230,pl=40,pr=8,pt=12,pb=30,iw=W-pl-pr,ih=h-pt-pb,bw=iw/ms.length;
+  const tot=ms.map(m=>keys.map(k=>sum(rows.filter(r=>r.ano_mes===m&&r.classe===k),'n')));
+  const mx=Math.max(...tot.map(t=>t.reduce((a,b)=>a+b,0)),1)*1.08;
+  let s=`<svg viewBox="0 0 ${W} ${h}" width="100%">`;
+  for(let i=0;i<=4;i++){const y=pt+ih-ih*i/4;s+=`<line class="grid" x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}"/><text x="${pl-6}" y="${y+4}" text-anchor="end">${Math.round(mx*i/4)}</text>`}
+  ms.forEach((m,i)=>{let y0=pt+ih;const x=pl+i*bw+bw*.14,w=bw*.72;
+    keys.forEach((k,j)=>{const v=tot[i][j];if(!v)return;const hh=ih*v/mx;y0-=hh;
+      s+=`<rect x="${x}" y="${y0}" width="${w}" height="${Math.max(hh-2,1)}" rx="3" fill="${col[k]}" data-tip="<b>${lblMes(m)}</b><br>${CLS[k][1]}: ${v}"/>`});
+    s+=`<text x="${x+w/2}" y="${h-pb+14}" text-anchor="middle" style="font-size:10px">${lblMes(m)}</text>`});
+  return s+'</svg>';
+}
+
+// ---------- páginas
+function kpi(l,v,s='',c=''){return `<div class="kpi ${c}"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`}
+
+function pgGeral(){
+  const c=cubo(),tot=sum(c,'valor'),q=sum(c,'qtd');
+  const am=groupBy(c,'ano_mes').sort((a,b)=>a.k<b.k?-1:1);
+  const mapAll=new Map(groupBy(D.cubo.filter(fOrg()),'ano_mes').map(d=>[d.k,d.v]));
+  am.forEach((d,i)=>{const prev=mapAll.get(shift(d.k,-1)),py=mapAll.get(shift(d.k,-12));d.g=prev?(d.v-prev)/prev*100:null;d.y=py?(d.v-py)/py*100:null});
+  const ramo=groupBy(c,'ramo_atividade').sort((a,b)=>b.v-a.v);
+  const org=groupBy(c,'orgao_superior').sort((a,b)=>b.v-a.v);
+  const un=D.unidades.filter(u=>S.org==='Todos'||u.orgao_superior===S.org).sort((a,b)=>b.valor-a.valor).slice(0,10);
+  const mensal=am.length?tot/am.length:0;
+  return `<div class="grid kpis">
+    ${kpi('Transações',num(q),'no período filtrado')}${kpi('Gasto total',brlc(tot),brl(tot))}
+    ${kpi('Ticket médio',brl(q?tot/q:0),'por transação')}${kpi('Média mensal',brlc(mensal),am.length+' meses')}</div>
+  <div class="grid" style="margin-top:12px">
+   <div class="card"><h2>Gasto e variação por período (R$)</h2><p class="sub">▲▼ = variação sobre o mês anterior. Tom claro = nov/dez (alta sazonal de fim de exercício, esperada — compare com o mesmo mês do ano anterior no tooltip).</p>${barsV(am,{hi:['2025-11','2025-12']})}</div>
+   <div class="grid cols2">
+    <div class="card"><h2>Gasto por categoria (ramo do favorecido)</h2><p class="sub">Ramo vem do cruzamento CNPJ → atividade; saques não têm favorecido.</p>${barsH(ramo.map(r=>({k:r.k,v:r.v})))}</div>
+    <div class="card"><h2>Gasto por órgão superior</h2><p class="sub">Comparação entre órgãos de portes diferentes: prefira olhar gasto por transação e por unidade.</p>${barsH(org,{color:'var(--brand-2)'})}</div>
+   </div>
+   <div class="card"><h2>10 maiores unidades gestoras</h2><p class="sub">% atípico = transações com algum indício ÷ total da unidade. Valor alto de % pede contexto, não conclusão.</p>
+    <div class="scroll"><table><tr><th>Unidade</th><th>Tipo</th><th class="n">Gasto</th><th class="n">Transações</th><th class="n">% atípico</th></tr>
+    ${un.map(u=>`<tr><td>${esc(u.unidade)}</td><td>${esc(u.tipo_unidade)}</td><td class="n">${brl(u.valor)}</td><td class="n">${num(u.qtd)}</td><td class="n">${pct(u.pct_atipico,2)}</td></tr>`).join('')}</table></div></div>
+  </div>`;
+}
+function shift(m,k){let y=+m.slice(0,4),mm=+m.slice(5,7)-1+k;y+=Math.floor(mm/12);mm=((mm%12)+12)%12;return y+'-'+String(mm+1).padStart(2,'0')}
+
+function pgForn(){
+  const lista=(S.org==='Todos'?D.fornecedores_todos:D.fornecedores.filter(f=>f.orgao_superior===S.org)).slice(0,15);
+  const c=cubo(),tot=sum(c.filter(r=>r.ramo_atividade!=='Saque em espécie'),'valor'),top=sum(lista,'valor');
+  const mx=Math.max(...lista.map(f=>f.valor),1);
+  return `<div class="grid kpis">${kpi('Top 15 fornecedores',brlc(top),'soma do ranking (todo o período)')}${kpi('Participação no gasto em compras',pct(100*top/Math.max(tot,1)),'do filtro atual, aproximado')}</div>
+  <div class="card" style="margin-top:12px"><h2>Ranking de fornecedores</h2><p class="sub">Exclui favorecido sigiloso, sem informação e saques. O ranking cobre todo o período da base (o filtro de meses não se aplica aqui).
+   Concentração alta pode ser registro de preços, fornecedor único na região ou contrato — é pergunta, não resposta.</p>
+   <div class="scroll"><table><tr><th>#</th><th>Fornecedor</th><th>Ramo</th><th class="n">Transações</th><th class="n">Gasto</th><th style="width:22%"></th></tr>
+   ${lista.map((f,i)=>`<tr><td>${i+1}</td><td>${esc(f.favorecido)}<div style="color:var(--muted);font-size:11px">${esc(f.doc_favorecido)}</div></td><td>${esc(f.ramo_atividade)}</td><td class="n">${num(f.qtd)}</td><td class="n">${brl(f.valor)}</td>
+   <td><svg viewBox="0 0 100 8" width="100%"><rect width="${100*f.valor/mx}" height="8" rx="3" fill="var(--brand)"/></svg></td></tr>`).join('')}</table></div></div>`;
+}
+
+function alertasFiltrados(){
+  return D.alertas.filter(a=>(S.org==='Todos'||a.orgao_superior===S.org)&&a.data.slice(0,7)>=S.ini&&a.data.slice(0,7)<=S.fim&&
+    (S.cls==='Todas'||a.classe===S.cls)&&(S.regra==='Todas'||a.regras.includes(S.regra))&&
+    (!S.q||(a.unidade+a.favorecido+a.portador+a.ramo_atividade).toLowerCase().includes(S.q.toLowerCase())));
+}
+function pgAtip(){
+  const am=D.atipicos_mes.filter(r=>fOrg()(r)&&fPer(r));
+  const byCls=k=>sum(am.filter(r=>r.classe===k),'n'),valCls=k=>sum(am.filter(r=>r.classe===k),'valor');
+  const tot=sum(am,'n'),totTx=sum(cubo(),'qtd');
+  const regras=Object.keys(D.pesos),orgRegras=S.org==='Todos'?D.regras_disparos:D.regras_por_orgao[S.org];
+  const rd=regras.map(r=>({k:r.replace(/^R\d_/,'').replace(/_/g,' ').toLowerCase(),v:orgRegras[r]||0,r}));
+  const lista=alertasFiltrados();
+  return `<div class="grid kpis">
+    ${kpi('Transações com indício',num(tot),pct(100*tot/Math.max(totTx,1),2)+' do total')}
+    ${kpi('Prioridade alta',num(byCls('Atípico - prioridade alta')),brlc(valCls('Atípico - prioridade alta'))+' envolvidos','alta')}
+    ${kpi('Observar',num(byCls('Atípico - observar')),brlc(valCls('Atípico - observar')))}
+    ${kpi('Contexto provável',num(byCls('Atípico com contexto provável')),'explicação estrutural conhecida')}</div>
+  <div class="card" style="margin-top:12px"><p class="note"><b>Como ler:</b> cada alerta é uma <b>hipótese de trabalho</b>. O painel mostra a regra que disparou, o contexto legítimo que já foi considerado
+  e as explicações inocentes plausíveis. Só a apuração (nota fiscal, finalidade, ato de autorização) distingue erro, exceção autorizada e irregularidade.</p></div>
+  <div class="grid cols2" style="margin-top:12px">
+   <div class="card"><h2>Alertas por mês e classe</h2><div class="legend"><span><i style="background:var(--alta)"></i>Prioridade alta</span><span><i style="background:var(--obs)"></i>Observar</span><span><i style="background:var(--ctx)"></i>Contexto provável</span></div>${stackedMonths(am)}</div>
+   <div class="card"><h2>Disparos por regra</h2><p class="sub">Passe o mouse para ver as hipóteses legítimas da regra.</p>
+    ${barsH(rd.map(d=>({k:d.k,v:d.v,extra:'Peso '+D.pesos[d.r]+' · '+esc(D.hipoteses[d.r])})),{fmt:v=>num(v),color:'var(--brand-2)',labelW:150})}</div>
+  </div>
+  <div class="card" style="margin-top:12px"><h2>Fila de investigação (600 maiores scores)</h2>
+   <div class="filters" style="margin:6px 0 10px">
+    <label>Classe<select id="fCls">${['Todas',...Object.keys(CLS)].map(c=>`<option ${c===S.cls?'selected':''}>${c}</option>`).join('')}</select></label>
+    <label>Regra<select id="fRegra">${['Todas',...regras].map(c=>`<option ${c===S.regra?'selected':''}>${c}</option>`).join('')}</select></label>
+    <label>Busca<input type="search" id="fQ" placeholder="unidade, fornecedor, portador" value="${esc(S.q)}"></label>
+    <span class="note">${num(lista.length)} alertas</span></div>
+   <div class="scroll"><table><tr><th>Data</th><th>Unidade</th><th>Favorecido</th><th class="n">Valor</th><th>Classe</th><th>Regras</th></tr>
+   ${lista.slice(0,150).map((a,i)=>`<tr class="row" data-i="${i}"><td>${a.data.split('-').reverse().join('/')}</td><td>${esc(a.unidade)}</td><td>${esc(a.favorecido)}<div style="color:var(--muted);font-size:11px">${esc(a.ramo_atividade)}</div></td><td class="n">${brl(a.valor)}</td><td>${badge(a.classe)}<div style="font-size:11px;color:var(--muted)">score ${a.score}</div></td><td>${a.regras.split(', ').map(r=>`<span class="rule">${r}</span>`).join('')}</td></tr>
+   ${S.open===i?`<tr class="det"><td colspan="6"><b>Portador:</b> ${esc(a.portador)} · <b>Transação:</b> ${esc(a.transacao)}<br>${a.contexto?`<b>Contexto já considerado:</b> ${esc(a.contexto)}<br>`:''}<b>Possíveis explicações legítimas:</b> ${esc(a.hipoteses).replace(/ \| /g,'<br>• ').replace(/^/,'• ')}<br><b>O que verificar:</b> finalidade da despesa, nota fiscal, ato de autorização, histórico do portador e do fornecedor.</td></tr>`:''}`).join('')}</table></div>
+   ${lista.length>150?'<p class="note">Mostrando 150. Use os filtros ou abra <code>out/fila_investigacao.csv</code> para a lista completa.</p>':''}</div>
+  ${D.validacao&&D.validacao.simulado?pgValid():''}`;
+}
+function pgValid(){const v=D.validacao;return `<div class="card" style="margin-top:12px"><h2>Validação do detector (só existe na base simulada)</h2>
+ <p class="sub">${num(v.injetadas)} anomalias foram plantadas com gabarito. Recall geral ${pct(v['recall_%'])} · precisão geral ${pct(v['precisao_%'])}.</p>
+ <table><tr><th>Tipo plantado</th><th class="n">Plantadas</th><th class="n">Detectadas</th><th class="n">Recall</th><th class="n">Disparos da regra</th><th class="n">Precisão</th></tr>
+ ${Object.entries(v.por_tipo).map(([k,x])=>`<tr><td>${k.replace(/_/g,' ').toLowerCase()}</td><td class="n">${x.injetadas}</td><td class="n">${x.detectadas}</td><td class="n">${pct(x['recall_%'])}</td><td class="n">${x.disparos_regra}</td><td class="n">${pct(x['precisao_%'])}</td></tr>`).join('')}</table>
+ <p class="note" style="margin-top:8px">${esc(v.nota)} Em fim de semana e valor extremo a precisão é baixa porque a base normal também produz casos assim — exatamente por isso a saída é uma <b>fila de triagem</b>, não uma lista de culpados.</p></div>`}
+
+function pgQual(){
+  const q=D.qualidade,n=q.linhas_brutas;
+  const it=[
+   ['Linhas carregadas',n,'Base de partida.'],
+   ['Valores/datas inválidos',q.valor_invalido+q.data_invalida,'Descartados na limpeza (decimal com vírgula e data dd/mm/aaaa convertidos).'],
+   ['Estornos (valor negativo)',q.estornos_negativos,'Mantidos no gasto líquido; excluídos das regras de compra.'],
+   ['Favorecido sigiloso',q.favorecido_sigiloso,'Fora do ranking de fornecedores e da regra de concentração — não é possível analisar quem recebeu.'],
+   ['Favorecido sem informação',q.favorecido_sem_informacao,'Inclui saques. Sem CNPJ não há categoria.'],
+   ['Saques em espécie',q.saques,'Analisados à parte (regra de saque redondo).'],
+   ['Mês do extrato ≠ mês da transação',q.mes_extrato_diferente_da_transacao,'Análise temporal usa a DATA DA TRANSAÇÃO, não o extrato.'],
+   ['Linhas totalmente repetidas',q.linhas_totalmente_duplicadas,'Sem ID da transação não dá para saber se é erro de carga ou compra repetida. Sinalizadas, não removidas.'],
+   ['CPF do portador mascarado',q.cpf_mascarado,'Identificação do portador só por CPF parcial + nome: cuidado com homônimos.'],
+   ['Fim de semana em unidade 24h (não sinalizado)',q.fim_semana_em_unidade_24h_nao_sinalizado,'Hospitais e forças operam todo dia: não vira alerta (contexto aplicado antes).'],
+  ];
+  return `<div class="card"><h2>Qualidade dos dados</h2><p class="sub">Problemas que existem nos arquivos reais do Portal da Transparência e como cada um foi tratado.</p>
+  <table><tr><th>Indicador</th><th class="n">Qtd</th><th class="n">% da base</th><th>Tratamento</th></tr>${it.map(r=>`<tr><td>${r[0]}</td><td class="n">${num(r[1])}</td><td class="n">${pct(100*r[1]/n,2)}</td><td>${r[2]}</td></tr>`).join('')}</table>
+  <p class="note" style="margin-top:10px">Nov/dez têm gasto médio ${pct(q['gasto_nov_dez_vs_media_demais_meses_%'])} acima dos demais meses: sazonalidade de fim de exercício, tratada como contexto.</p></div>`;
+}
+function pgMeto(){
+  const p=D.parametros;return `<div class="card meth"><h2>Metodologia</h2>
+  <h3>Pergunta</h3><p>Como identificar padrões de gasto, despesas atípicas e oportunidades de fiscalização, <b>sem tratar toda anomalia como irregularidade</b>?</p>
+  <h3>Pipeline</h3><ol><li>Carga bruta (SQL Server <code>stg</code>) e tratamento tipado (<code>dbo.cpgf</code>).</li><li>Análises descritivas: período, categoria, fornecedor e faixa de valor.</li><li>Seis regras de atipicidade com peso, parâmetros em tabela e hipóteses legítimas por regra.</li><li>Contexto estrutural (fim de exercício, unidade 24h, evento anual) <b>reduz</b> o score antes da triagem.</li><li>Fila de investigação priorizada por score e valor.</li></ol>
+  <h3>Regras e pesos</h3><ul>${Object.entries(D.pesos).map(([r,w])=>`<li><b>${r}</b> (peso ${w}) — ${esc(D.hipoteses[r])}</li>`).join('')}</ul>
+  <h3>Parâmetros</h3><p>${Object.entries(p).map(([k,v])=>`<code>${k}=${v}</code>`).join(' · ')}</p>
+  <h3>Classes</h3><ul><li>${badge('Atípico - prioridade alta')} score ≥ 3 após ajuste de contexto.</li><li>${badge('Atípico - observar')} score 1–2.</li><li>${badge('Atípico com contexto provável')} havia indício, mas existe explicação estrutural conhecida.</li></ul>
+  <h3>Limites</h3><ul><li>A base pública não traz nota fiscal, finalidade nem autorização: o painel gera <b>hipóteses</b>, não provas.</li><li>Categoria depende do cruzamento CNPJ→atividade; sigilosos e saques ficam sem categoria.</li><li>Limites de valor mudam por norma e por órgão: ajuste os parâmetros.</li><li>Regras com precisão baixa servem para ordenar a fila, nunca para concluir.</li></ul></div>`;
+}
+
+const TABS=[['geral','Visão geral',pgGeral],['forn','Fornecedores',pgForn],['atip','Atipicidades',pgAtip],['qual','Qualidade dos dados',pgQual],['meto','Metodologia',pgMeto]];
+function render(){
+  $('#tabs').innerHTML=TABS.map(t=>`<button role="tab" aria-selected="${S.tab===t[0]}" data-t="${t[0]}">${t[1]}</button>`).join('');
+  $('#view').innerHTML=TABS.find(t=>t[0]===S.tab)[2]();
+}
+// init filtros
+$('#fOrg').innerHTML=['Todos',...orgaos].map(o=>`<option>${esc(o)}</option>`).join('');
+const optM=sel=>$(sel).innerHTML=meses.map(m=>`<option value="${m}">${lblMes(m)}</option>`).join('');
+optM('#fIni');optM('#fFim');$('#fFim').value=S.fim;
+$('#fOrg').onchange=e=>{S.org=e.target.value;S.open=-1;render()};
+$('#fIni').onchange=e=>{S.ini=e.target.value;if(S.ini>S.fim){S.fim=S.ini;$('#fFim').value=S.fim}render()};
+$('#fFim').onchange=e=>{S.fim=e.target.value;if(S.fim<S.ini){S.ini=S.fim;$('#fIni').value=S.ini}render()};
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-t]');if(t){S.tab=t.dataset.t;render();return}
+  const r=e.target.closest('tr.row');if(r){const i=+r.dataset.i;S.open=S.open===i?-1:i;render()}});
+document.addEventListener('change',e=>{if(e.target.id==='fCls'){S.cls=e.target.value;S.open=-1;render()}if(e.target.id==='fRegra'){S.regra=e.target.value;S.open=-1;render()}});
+document.addEventListener('input',e=>{if(e.target.id==='fQ'){S.q=e.target.value;S.open=-1;const p=e.target.selectionStart;render();const n=$('#fQ');n.focus();n.setSelectionRange(p,p)}});
+$('#btnTheme').onclick=()=>{const d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('cpgf-theme',d.dataset.theme)}catch(e){}};
+try{const t=localStorage.getItem('cpgf-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}
+if(D.gerado_com.includes('SIMULADOS')){const b=$('#sim');b.classList.remove('hidden');b.innerHTML='<b>DADOS SIMULADOS.</b> Todos os órgãos, portadores, CPFs e fornecedores são fictícios, gerados no formato do CPGF do Portal da Transparência. Nenhuma pessoa ou empresa real é representada. Substitua pelos CSVs oficiais para análise real (veja o README).'}
+document.title='Painel CPGF — '+(D.gerado_com.includes('SIMULADOS')?'dados simulados':'dados reais');
+render();
+</script>
+</body>
+</html>
